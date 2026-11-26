@@ -1,0 +1,68 @@
+@startuml
+title Online Shop - Activity Diagram (Checkout & Payment Flow)
+
+|Customer|
+start
+:Select Checkout Option;
+
+|OrderService|
+:Retrieve User Profile & Cart;
+if (Cart is empty?) then (yes)
+    :Throw BusinessRuleException\n("Cart is empty");
+    stop
+else (no)
+endif
+
+|Customer|
+:Select Shipping Address;
+
+|OrderService|
+:Validate Address belongs to User;
+if (Address valid?) then (no)
+    :Throw BusinessRuleException\n("Invalid address");
+    stop
+else (yes)
+endif
+
+:Iterate CartItems & Check Product\nActive Status and Stock;
+if (All items active & in stock?) then (no)
+    :Throw BusinessRuleException;
+    stop
+else (yes)
+    :Create Order (PENDING_PAYMENT);
+    :Save Order in OrderRepository;
+    :Clear Cart in CartService;
+endif
+
+|Customer|
+if (Pay Now?) then (yes)
+    :Choose Payment Simulation\n(Success / Failure);
+else (no)
+    :Order remains PENDING_PAYMENT;
+    stop
+endif
+
+|PaymentService|
+:Verify Order is payable (canBePaid);
+if (simulateSuccess?) then (yes)
+    :Re-verify Product Stock;
+endif
+
+|PaymentGateway|
+:charge(order, simulateSuccess);
+
+|PaymentService|
+if (Transaction == SUCCESS?) then (yes)
+    fork
+        :Deduct Product Stock\nand Save in ProductRepository;
+    fork again
+        :Mark Order as PAID\nwith PaymentTransaction;
+    end fork
+    :Display Gateway Reference;
+    stop
+else (no)
+    :Mark Order as FAILED_PAYMENT\n(Retry allowed);
+    :Display Failure Reason;
+    stop
+endif
+@enduml

@@ -1,0 +1,82 @@
+@startuml
+title Online Shop - Sequence Diagram (Bonus: Checkout & Payment Scenario)
+autonumber
+
+actor Customer
+participant "CustomerMenuHandler" as UI
+participant "OrderService" as OS
+participant "UserService" as US
+participant "CartService" as CS
+participant "ProductRepository" as PR
+participant "OrderRepository" as OR
+participant "PaymentService" as PayS
+participant "PaymentGateway" as GW
+
+Customer -> UI : Select Checkout (addressId)
+activate UI
+UI -> OS : checkout(userId, addressId)
+activate OS
+
+OS -> US : getProfile(userId)
+activate US
+US --> OS : User (with Addresses)
+deactivate US
+
+OS -> CS : getOrCreateCart(userId)
+activate CS
+CS --> OS : Cart (non-empty)
+deactivate CS
+
+loop for each CartItem in Cart
+    OS -> PR : findById(productId)
+    activate PR
+    PR --> OS : Optional<Product>
+    deactivate PR
+end
+
+OS -> OR : save(new Order [PENDING_PAYMENT])
+activate OR
+OR --> OS : saved
+deactivate OR
+
+OS -> CS : clearCart(userId)
+activate CS
+CS --> OS : cleared
+deactivate CS
+
+OS --> UI : Order (PENDING_PAYMENT)
+deactivate OS
+
+Customer -> UI : Confirm Pay Now (simulateSuccess = true)
+UI -> PayS : processPayment(userId, orderId, true)
+activate PayS
+
+PayS -> OS : getOrderDetails(userId, orderId)
+activate OS
+OS --> PayS : Order
+deactivate OS
+
+PayS -> PR : findById(productId) [verify stock]
+activate PR
+PR --> PayS : Product
+deactivate PR
+
+PayS -> GW : charge(order, true)
+activate GW
+GW --> PayS : PaymentTransaction (SUCCESS)
+deactivate GW
+
+loop for each OrderItem
+    PayS -> PR : findById(productId) & save(stock--)
+    activate PR
+    PR --> PayS : updated
+    deactivate PR
+end
+
+PayS -> PayS : order.markPaid(transaction)
+PayS --> UI : PaymentTransaction (SUCCESS)
+deactivate PayS
+
+UI --> Customer : Display Gateway Ref & Confirmation
+deactivate UI
+@enduml

@@ -1,0 +1,30 @@
+@startuml
+title Online Shop - Deployment Diagram
+
+node "User Workstation (Windows / Linux / macOS)" as Client {
+    node "Terminal / Console Shell" as Term {
+        artifact "Standard I/O (UTF-8)" as IO
+    }
+
+    node "Java Runtime Environment (JVM 17+)" as JVM {
+        artifact "online-shop-1.0.0.jar" as Jar {
+            component "CLI Presentation\n(ConsoleApp, MenuHandlers)" as CLI
+            component "Application Services\n(User, Product, Order, Payment, ...)" as Services
+            component "Domain Model\n(Entities, Value Objects, Exceptions)" as Domain
+            component "In-Memory Repositories\n(ConcurrentHashMap Store)" as Repo
+            component "Security & Gateway Adapters\n(Sha256PasswordHasher, SimulatedPaymentGateway)" as Adapters
+        }
+    }
+}
+
+node "External Payment Gateway\n(Simulated / Pluggable via PaymentGateway)" as ExtGW <<device>> {
+    component "Bank Gateway API" as BankAPI
+}
+
+IO -- CLI : stdin / stdout
+CLI --> Services : method calls
+Services --> Domain : domain rules
+Services --> Repo : CRUD in RAM
+Services --> Adapters : PasswordHasher / PaymentGateway
+Adapters ..> BankAPI : <<protocol>>\nSimulated / HTTPS
+@enduml

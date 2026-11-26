@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>مستند طراحی سیستم — فاز ۲ پروژه اصول طراحی نرم‌افزار</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 18mm 16mm;
+    }
+    body {
+      font-family: "Tahoma", "Segoe UI", "Vazirmatn", sans-serif;
+      line-height: 1.8;
+      color: #1e293b;
+      margin: 0;
+      padding: 0;
+      font-size: 13px;
+    }
+    .cover {
+      page-break-after: always;
+      text-align: center;
+      padding-top: 40px;
+    }
+    .cover h1 {
+      font-size: 24px;
+      color: #0f172a;
+      margin-bottom: 6px;
+    }
+    .cover h2 {
+      font-size: 18px;
+      color: #334155;
+      font-weight: normal;
+      margin-top: 4px;
+    }
+    .cover .subtitle {
+      font-size: 15px;
+      color: #475569;
+      margin: 16px 0 28px;
+    }
+    .info-box {
+      text-align: right;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 16px 22px;
+      margin: 24px auto;
+      max-width: 580px;
+      background: #f8fafc;
+    }
+    .info-box h3 {
+      margin-top: 0;
+      color: #0f172a;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 6px;
+    }
+    h2.section-title {
+      color: #0f172a;
+      border-bottom: 2px solid #2563eb;
+      padding-bottom: 6px;
+      margin-top: 28px;
+      page-break-after: avoid;
+    }
+    h3.sub-title {
+      color: #1e40af;
+      margin-top: 18px;
+      page-break-after: avoid;
+    }
+    .diagram-block {
+      page-break-inside: avoid;
+      margin: 18px 0 26px;
+      text-align: center;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 12px;
+      background: #ffffff;
+    }
+    .diagram-block img {
+      max-width: 100%;
+      max-height: 680px;
+      height: auto;
+    }
+    .diagram-caption {
+      font-size: 12px;
+      color: #475569;
+      margin-top: 8px;
+      font-weight: bold;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      font-size: 12px;
+    }
+    th, td {
+      border: 1px solid #cbd5e1;
+      padding: 8px 10px;
+      text-align: right;
+      vertical-align: top;
+    }
+    th {
+      background: #eff6ff;
+      color: #1e3a8a;
+    }
+    code {
+      direction: ltr;
+      unicode-bidi: embed;
+      background: #f1f5f9;
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-family: Consolas, monospace;
+      font-size: 11.5px;
+    }
+    .page-break {
+      page-break-before: always;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- صفحه اول: مشخصات دانشگاه و اعضای گروه -->
+  <div class="cover">
+    <h1>دانشگاه صنعتی امیرکبیر (پلی‌تکنیک تهران)</h1>
+    <h2>دانشکده ریاضی و علوم کامپیوتر — درس اصول طراحی نرم‌افزار</h2>
+    <div class="subtitle">
+      <strong>مستند طراحی معماری و بازطراحی شیءگرا (فاز ۲ پروژه)</strong><br />
+      سامانه فروشگاه آنلاین (Online Shop)<br />
+      استاد درس: دکتر هانیه فلاح | سرتدریسیار: امیرمحمد ذاکر | آبان ۱۴۰۵
+    </div>
+
+    <div class="info-box">
+      <h3>اطلاعات اعضای گروه</h3>
+      <table>
+        <tr>
+          <th>نام و نام خانوادگی</th>
+          <th>شماره دانشجویی</th>
+          <th>نقش و وظایف</th>
+        </tr>
+        <tr>
+          <td>[نام عضو اول]</td>
+          <td>[شماره دانشجویی عضو اول]</td>
+          <td>بازطراحی SOLID سرویس‌ها و مخازن، نمودارهای Class، Object و Sequence، تست‌ها</td>
+        </tr>
+        <tr>
+          <td>[نام عضو دوم]</td>
+          <td>[شماره دانشجویی عضو دوم]</td>
+          <td>بازطراحی لایه CLI و استراتژی‌ها، نمودارهای Activity، Component و Deployment، مستندسازی و README</td>
+        </tr>
+      </table>
+      <p><strong>لینک مخزن GitHub پروژه:</strong> <code>https://github.com/&lt;username&gt;/online-shop</code></p>
+    </div>
+  </div>
+
+  <!-- ۱. معرفی کوتاه سیستم -->
+  <h2 class="section-title">۱. معرفی کوتاه سیستم</h2>
+  <p>
+    سامانه <strong>فروشگاه آنلاین (Online Shop)</strong> یک نرم‌افزار ماژولار به زبان <strong>Java 17</strong> و مبتنی بر <strong>Maven</strong> است که تمامی ۳۶ داستان کاربری (User Story) تعریف‌شده در فاز اول را در قالب یک معماری لایه‌بندی‌شده (Layered Architecture) پیاده‌سازی می‌کند. این سامانه سه نقش کاربری زیر را پشتیبانی می‌نماید:
+  </p>
+  <ul>
+    <li><strong>کاربر مهمان (Guest):</strong> مشاهده کاتالوگ محصولات فعال، مشاهده جزئیات و نظرات، جستجو، فیلتر پیشرفته، مرتب‌سازی، مشاهده دسته‌بندی‌ها، ثبت‌نام، ورود و بازیابی رمز عبور.</li>
+    <li><strong>مشتری (Customer):</strong> مدیریت سبد خرید، انتخاب آدرس ارسال، ثبت سفارش (Checkout)، پرداخت از طریق درگاه (با پشتیبانی از پرداخت ناموفق و تلاش مجدد)، مشاهده تاریخچه و جزئیات سفارش‌ها، مدیریت پروفایل و آدرس‌ها، و ثبت نظر و امتیاز برای کالاهای خریداری‌شده.</li>
+    <li><strong>مدیر سیستم (Admin):</strong> مشاهده و تغییر موجودی انبار (با جلوگیری از منفی شدن موجودی)، ایجاد و ویرایش کالا، فعال/غیرفعال‌سازی کالا، ایجاد دسته‌بندی و نظارت بر سفارش‌ها با ماسک‌شدن اطلاعات حساس تراکنش.</li>
+  </ul>
+
+  <!-- ۲. توضیحات Refactoring و اصول SOLID -->
+  <h2 class="section-title">۲. تغییرات و Refactoringهای انجام‌شده برای رعایت اصول SOLID</h2>
+  <p>
+    در بررسی کد فاز اول، چند گلوگاه طراحی از جمله کلاس یکپارچه <code>InMemoryDataStore</code>، منطق مرتب‌سازی مبتنی بر <code>switch</code> در <code>ProductService</code>، وابستگی مستقیم <code>PaymentService</code> به منطق شبیه‌سازی درگاه، و کلاس حجیم <code>ConsoleApp</code> شناسایی شدند. در فاز دوم، ساختار کد به شرح زیر بازطراحی شد:
+  </p>
+  <table>
+    <tr>
+      <th>اصل SOLID</th>
+      <th>مصداق نقض در فاز ۱</th>
+      <th>اصلاح و بازطراحی انجام‌شده در فاز ۲</th>
+    </tr>
+    <tr>
+      <td><strong>SRP</strong><br/>(تک‌مسئولیتی)</td>
+      <td>
+        کلاس <code>InMemoryDataStore</code> هم مخزن داده‌ها بود، هم هش رمز عبور را انجام می‌داد و هم داده‌های اولیه را Seed می‌کرد. کلاس <code>ConsoleApp</code> نیز بیش از ۷۰۰ خط کد برای تمام نقش‌ها داشت.
+      </td>
+      <td>
+        استخراج <code>Sha256PasswordHasher</code>، جداسازی <code>SampleDataSeeder</code>، تفکیک مخازن به ۶ کلاس تخصصی، انتقال محاسبه امتیاز به <code>ReviewService</code>، و تفکیک <code>ConsoleApp</code> به <code>SessionContext</code>، <code>CatalogBrowserView</code>، <code>GuestMenuHandler</code>، <code>CustomerMenuHandler</code> و <code>AdminMenuHandler</code>.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>OCP</strong><br/>(باز/بسته)</td>
+      <td>
+        متد <code>ProductService.sortProducts</code> با <code>switch</code> پیاده‌سازی شده بود و افزودن معیار جدید مستلزم تغییر کد سرویس بود. درگاه پرداخت نیز در <code>PaymentService</code> سخت‌کد شده بود.
+      </td>
+      <td>
+        تعریف رابط <code>ProductSortStrategy</code> و کلاس‌های استراتژی مجزا همراه با <code>ProductSortStrategyFactory</code>؛ تعریف رابط <code>PaymentGateway</code> با پیاده‌سازی <code>SimulatedPaymentGateway</code>؛ و تعریف رابط <code>MenuHandler</code> برای توسعه منوها بدون تغییر <code>ConsoleApp</code>.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>LSP</strong><br/>(جایگزینی لیسکوف)</td>
+      <td>
+        عدم وجود سلسله‌مراتب استراتژی و هندلرهای منو با قرارداد یکسان.
+      </td>
+      <td>
+        تمام پیاده‌سازی‌های <code>ProductSortStrategy</code>، <code>PaymentGateway</code>، <code>MenuHandler</code>، مخازن و زیرکلاس‌های <code>DomainException</code> قرارداد رابط والد را بدون عوارض جانبی غیرمنتظره رعایت می‌کنند و کاملاً جایگزین‌پذیرند.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>ISP</strong><br/>(تفکیک رابط‌ها)</td>
+      <td>
+        تمام سرویس‌ها به کل <code>InMemoryDataStore</code> دسترسی داشتند (مثلاً <code>CategoryService</code> به کاربران و سفارش‌ها دسترسی داشت). همچنین <code>ProductService</code> متدهای امتیازدهی را در خود داشت.
+      </td>
+      <td>
+        شکستن مخزن به ۶ رابط کوچک و تخصصی (<code>UserRepository</code>، <code>CategoryRepository</code>، <code>ProductRepository</code>، <code>CartRepository</code>، <code>OrderRepository</code>، <code>ReviewRepository</code>) و تعریف رابط <code>ProductRatingProvider</code> صرفاً برای خواندن میانگین امتیاز و تعداد نظرات.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>DIP</strong><br/>(وارونگی وابستگی)</td>
+      <td>
+        سرویس‌های سطح بالا مستقیماً به کلاس عینی <code>InMemoryDataStore</code> و متد ایستای هش رمز عبور وابسته بودند.
+      </td>
+      <td>
+        وابستگی تمام سرویس‌ها به انتزاع‌ها (<code>*Repository</code>، <code>PasswordHasher</code>، <code>PaymentGateway</code>، <code>ProductRatingProvider</code>) و تزریق پیاده‌سازی‌های عینی از طریق <code>Main</code> به عنوان Composition Root.
+      </td>
+    </tr>
+  </table>
+
+  <!-- ۳. نمودارهای UML -->
+  <div class="page-break"></div>
+  <h2 class="section-title">۳. نمودارهای معماری سیستم (UML Diagrams)</h2>
+
+  <h3 class="sub-title">۳.۱. نمودار کلاس (Class Diagram)</h3>
+  <p>این نمودار ساختار کامل کلاس‌ها، رابط‌ها، موجودیت‌ها، اشیاء مقداری و وابستگی‌های نسخه نهایی و Refactorشده را نمایش می‌دهد.</p>
+  <div class="diagram-block">
+    <img src="diagrams/class-diagram.svg" alt="Class Diagram" />
+    <div class="diagram-caption">شکل ۱: نمودار کلاس نهایی سیستم منطبق بر اصول SOLID</div>
+  </div>
+
+  <div class="page-break"></div>
+  <h3 class="sub-title">۳.۲. نمودار شیء (Object Diagram)</h3>
+  <p>نمایی از نمونه‌های عینی (Instances) در زمان اجرا بر اساس داده‌های اولیه سیستم و سبد خرید مشتری.</p>
+  <div class="diagram-block">
+    <img src="diagrams/object-diagram.svg" alt="Object Diagram" />
+    <div class="diagram-caption">شکل ۲: نمودار شیء از وضعیت لحظه‌ای سیستم</div>
+  </div>
+
+  <div class="page-break"></div>
+  <h3 class="sub-title">۳.۳. نمودار فعالیت (Activity Diagram)</h3>
+  <p>جریان گام‌به‌گام عملیات ثبت سفارش (Checkout) و پرداخت (Payment) همراه با شاخه‌های تصمیم‌گیری، مدیریت خطا و کسر موجودی.</p>
+  <div class="diagram-block">
+    <img src="diagrams/activity-diagram.svg" alt="Activity Diagram" />
+    <div class="diagram-caption">شکل ۳: نمودار فعالیت فرایند ثبت سفارش و پرداخت</div>
+  </div>
+
+  <div class="page-break"></div>
+  <h3 class="sub-title">۳.۴. نمودار کامپوننت (Component Diagram)</h3>
+  <p>نمایش کامپوننت‌های نرم‌افزاری، رابط‌های ارائه‌شده/موردنیاز (Provided/Required Interfaces) و نحوه جداسازی لایه‌ها.</p>
+  <div class="diagram-block">
+    <img src="diagrams/component-diagram.svg" alt="Component Diagram" />
+    <div class="diagram-caption">شکل ۴: نمودار کامپوننت معماری لایه‌ای و آداپتورها</div>
+  </div>
+
+  <h3 class="sub-title">۳.۵. نمودار استقرار (Deployment Diagram)</h3>
+  <p>نحوه استقرار و اجرای بسته نرم‌افزاری <code>online-shop-1.0.0.jar</code> بر روی ماشین مجازی جاوا (JVM 17+) و تعامل با ترمینال و درگاه پرداخت.</p>
+  <div class="diagram-block">
+    <img src="diagrams/deployment-diagram.svg" alt="Deployment Diagram" />
+    <div class="diagram-caption">شکل ۵: نمودار استقرار سامانه در محیط اجرا</div>
+  </div>
+
+  <div class="page-break"></div>
+  <h2 class="section-title">۴. نمودار امتیازی: نمودار توالی (Sequence Diagram)</h2>
+  <p>تعامل زمانی اشیاء و سرویس‌ها در سناریوی ثبت سفارش و پرداخت موفق مطابق با کد نهایی:</p>
+  <div class="diagram-block">
+    <img src="diagrams/sequence-diagram.svg" alt="Sequence Diagram" />
+    <div class="diagram-caption">شکل ۶: نمودار توالی سناریوی ثبت سفارش و پرداخت موفق</div>
+  </div>
+
+</body>
+</html>

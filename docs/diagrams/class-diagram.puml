@@ -1,0 +1,280 @@
+@startuml
+title Online Shop - Refactored Class Diagram (SOLID Architecture)
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+package "org.example" {
+    class Main {
+        + {static} main(args: String[]): void
+    }
+}
+
+package "org.example.cli" {
+    interface MenuHandler {
+        + supports(currentUser: User): boolean
+        + handle(context: SessionContext): boolean
+    }
+    class ConsoleApp {
+        - menuHandlers: List<MenuHandler>
+        - sessionContext: SessionContext
+        + run(): void
+    }
+    class SessionContext {
+        - currentUser: User
+        + getCurrentUser(): User
+        + setCurrentUser(user: User): void
+        + isGuest(): boolean
+    }
+    class GuestMenuHandler
+    class CustomerMenuHandler
+    class AdminMenuHandler
+    class CatalogBrowserView
+    class InputHelper
+
+    ConsoleApp o-- "1..*" MenuHandler
+    ConsoleApp *-- "1" SessionContext
+    MenuHandler <|.. GuestMenuHandler
+    MenuHandler <|.. CustomerMenuHandler
+    MenuHandler <|.. AdminMenuHandler
+    GuestMenuHandler --> CatalogBrowserView
+    CustomerMenuHandler --> CatalogBrowserView
+    AdminMenuHandler --> CatalogBrowserView
+    GuestMenuHandler --> InputHelper
+    CustomerMenuHandler --> InputHelper
+    AdminMenuHandler --> InputHelper
+}
+
+package "org.example.service" {
+    class UserService {
+        - userRepository: UserRepository
+        - passwordHasher: PasswordHasher
+        + register(...): User
+        + login(contact: String, password: String): User
+        + resetPassword(contact: String, newPassword: String): void
+        + getProfile(userId: String): User
+        + updateProfile(...): User
+        + addAddress(userId: String, address: Address): void
+    }
+    class CategoryService {
+        - categoryRepository: CategoryRepository
+        + getActiveCategories(): List<Category>
+        + getCategoryById(id: String): Category
+        + createCategory(name: String, desc: String): Category
+    }
+    class ProductService {
+        - productRepository: ProductRepository
+        - categoryRepository: CategoryRepository
+        - ratingProvider: ProductRatingProvider
+        - sortStrategyFactory: ProductSortStrategyFactory
+        + getActiveProducts(): List<Product>
+        + searchProducts(query: String): List<Product>
+        + filterProducts(...): List<Product>
+        + sortProducts(products: List<Product>, opt: ProductSortOption): List<Product>
+        + createProduct(...): Product
+        + updateProduct(...): Product
+    }
+    class CartService {
+        - cartRepository: CartRepository
+        - productRepository: ProductRepository
+        + getOrCreateCart(userId: String): Cart
+        + addToCart(userId: String, productId: String, qty: int): void
+        + updateItemQuantity(userId: String, productId: String, qty: int): void
+        + removeFromCart(userId: String, productId: String): void
+        + clearCart(userId: String): void
+    }
+    class OrderService {
+        - orderRepository: OrderRepository
+        - cartService: CartService
+        - productRepository: ProductRepository
+        - userService: UserService
+        + checkout(userId: String, addressId: String): Order
+        + getCustomerOrders(userId: String): List<Order>
+        + getOrderDetails(userId: String, orderId: String): Order
+        + getAllOrdersForAdmin(filter: OrderStatus): List<Order>
+    }
+    class PaymentService {
+        - orderService: OrderService
+        - productRepository: ProductRepository
+        - paymentGateway: PaymentGateway
+        + processPayment(userId: String, orderId: String, simulateSuccess: boolean): PaymentTransaction
+        + verifyAndConfirmPayment(orderId: String, tx: PaymentTransaction): boolean
+    }
+    class InventoryService {
+        - productRepository: ProductRepository
+        + getInventoryList(): List<Product>
+        + adjustStock(productId: String, delta: int): Product
+        + setStock(productId: String, newStock: int): Product
+    }
+    class ReviewService {
+        - reviewRepository: ReviewRepository
+        - orderRepository: OrderRepository
+        - productRepository: ProductRepository
+        - userService: UserService
+        + addReview(...): Review
+        + submitRatingOnly(...): Review
+        + getProductReviews(productId: String): List<Review>
+        + getAverageRating(productId: String): double
+        + getReviewCount(productId: String): int
+    }
+}
+
+package "org.example.service.security" {
+    interface PasswordHasher {
+        + hash(rawPassword: String): String
+        + matches(rawPassword: String, hashedPassword: String): boolean
+    }
+    class Sha256PasswordHasher
+    PasswordHasher <|.. Sha256PasswordHasher
+}
+
+package "org.example.service.payment" {
+    interface PaymentGateway {
+        + charge(order: Order, simulateSuccess: boolean): PaymentTransaction
+    }
+    class SimulatedPaymentGateway
+    PaymentGateway <|.. SimulatedPaymentGateway
+}
+
+package "org.example.service.rating" {
+    interface ProductRatingProvider {
+        + getAverageRating(productId: String): double
+        + getReviewCount(productId: String): int
+    }
+    ProductRatingProvider <|.. ReviewService
+}
+
+package "org.example.service.sorting" {
+    interface ProductSortStrategy {
+        + getOption(): ProductSortOption
+        + sort(products: List<Product>): List<Product>
+    }
+    class ProductSortStrategyFactory {
+        - strategies: Map<ProductSortOption, ProductSortStrategy>
+        + getStrategy(option: ProductSortOption): ProductSortStrategy
+    }
+    class CheapestSortStrategy
+    class MostExpensiveSortStrategy
+    class NewestSortStrategy
+    class HighestRatingSortStrategy
+    class PopularSortStrategy
+
+    ProductSortStrategy <|.. CheapestSortStrategy
+    ProductSortStrategy <|.. MostExpensiveSortStrategy
+    ProductSortStrategy <|.. NewestSortStrategy
+    ProductSortStrategy <|.. HighestRatingSortStrategy
+    ProductSortStrategy <|.. PopularSortStrategy
+    ProductSortStrategyFactory o-- "1..*" ProductSortStrategy
+}
+
+package "org.example.repository" {
+    interface UserRepository
+    interface CategoryRepository
+    interface ProductRepository
+    interface CartRepository
+    interface OrderRepository
+    interface ReviewRepository
+}
+
+package "org.example.repository.inmemory" {
+    class InMemoryUserRepository
+    class InMemoryCategoryRepository
+    class InMemoryProductRepository
+    class InMemoryCartRepository
+    class InMemoryOrderRepository
+    class InMemoryReviewRepository
+    class SampleDataSeeder
+
+    UserRepository <|.. InMemoryUserRepository
+    CategoryRepository <|.. InMemoryCategoryRepository
+    ProductRepository <|.. InMemoryProductRepository
+    CartRepository <|.. InMemoryCartRepository
+    OrderRepository <|.. InMemoryOrderRepository
+    ReviewRepository <|.. InMemoryReviewRepository
+}
+
+package "org.example.model" {
+    class User <<Entity>> {
+        - id: String
+        - fullName: String
+        - email: String
+        - phoneNumber: String
+        - passwordHash: String
+        - role: UserRole
+        - active: boolean
+        - addresses: List<Address>
+        - createdAt: LocalDateTime
+    }
+    class Category <<Entity>> {
+        - id: String
+        - name: String
+        - description: String
+        - active: boolean
+    }
+    class Product <<Entity>> {
+        - id: String
+        - name: String
+        - description: String
+        - price: double
+        - stock: int
+        - categoryId: String
+        - brand: String
+        - active: boolean
+    }
+    class Cart <<Entity>> {
+        - userId: String
+        - items: Map<String, CartItem>
+    }
+    class Order <<Entity>> {
+        - id: String
+        - userId: String
+        - items: List<OrderItem>
+        - shippingAddress: Address
+        - totalAmount: double
+        - status: OrderStatus
+        - paymentTransaction: PaymentTransaction
+    }
+    class Review <<Entity>> {
+        - id: String
+        - productId: String
+        - userId: String
+        - userDisplayName: String
+        - comment: String
+        - rating: int
+    }
+    class Address <<ValueObject>>
+    class CartItem <<ValueObject>>
+    class OrderItem <<ValueObject>>
+    class PaymentTransaction <<ValueObject>>
+
+    User "1" *-- "0..*" Address
+    Cart "1" *-- "0..*" CartItem
+    Order "1" *-- "1..*" OrderItem
+    Order --> "1" Address
+    Order "1" *-- "0..1" PaymentTransaction
+    Product "*" --> "1" Category
+    Review "*" --> "1" Product
+    Review "*" --> "1" User
+}
+
+UserService --> UserRepository
+UserService --> PasswordHasher
+CategoryService --> CategoryRepository
+ProductService --> ProductRepository
+ProductService --> CategoryRepository
+ProductService --> ProductRatingProvider
+ProductService --> ProductSortStrategyFactory
+CartService --> CartRepository
+CartService --> ProductRepository
+OrderService --> OrderRepository
+OrderService --> CartService
+OrderService --> ProductRepository
+OrderService --> UserService
+PaymentService --> OrderService
+PaymentService --> ProductRepository
+PaymentService --> PaymentGateway
+InventoryService --> ProductRepository
+ReviewService --> ReviewRepository
+ReviewService --> OrderRepository
+ReviewService --> ProductRepository
+ReviewService --> UserService
+@enduml
