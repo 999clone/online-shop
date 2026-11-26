@@ -1,0 +1,88 @@
+@startuml
+title Online Shop - Object Diagram (Runtime Snapshot)
+
+object "customer : User" as cust {
+    id = "user-cust"
+    fullName = "سجاد سارو"
+    email = "customer@shop.com"
+    phoneNumber = "09350000000"
+    role = CUSTOMER
+    active = true
+}
+
+object "defaultAddr : Address" as addr {
+    id = "addr-1"
+    recipientName = "سجاد سارو"
+    city = "تهران"
+    title = "منزل"
+    postalCode = "1591634311"
+    isDefault = true
+}
+
+object "cat3 : Category" as cat {
+    id = "cat-3"
+    name = "لوازم جانبی"
+    active = true
+}
+
+object "p5 : Product" as prod {
+    id = "prod-5"
+    name = "ماوس بی‌سیم لاجیتک MX Master 3S"
+    brand = "Logitech"
+    price = 4500000.0
+    stock = 20
+    categoryId = "cat-3"
+    active = true
+}
+
+object "pastOrder : Order" as ord {
+    id = "ord-seed-1"
+    userId = "user-cust"
+    totalAmount = 4500000.0
+    status = DELIVERED
+}
+
+object "orderItem1 : OrderItem" as oi {
+    productId = "prod-5"
+    productName = "ماوس بی‌سیم لاجیتک MX Master 3S"
+    unitPrice = 4500000.0
+    quantity = 1
+    subtotal = 4500000.0
+}
+
+object "trx1 : PaymentTransaction" as trx {
+    amount = 4500000.0
+    status = SUCCESS
+    gatewayReference = "REF-PAST-12345"
+}
+
+object "review1 : Review" as rev {
+    id = "rev-1"
+    productId = "prod-5"
+    userId = "user-cust"
+    rating = 5
+    comment = "کیفیت ساخت عالی است..."
+}
+
+object "custCart : Cart" as cart {
+    userId = "user-cust"
+}
+
+object "cartItem1 : CartItem" as ci {
+    productId = "prod-5"
+    quantity = 2
+    unitPrice = 4500000.0
+}
+
+cust *-- addr : addresses
+ord *-- oi : items
+ord --> addr : shippingAddress
+ord *-- trx : paymentTransaction
+ord --> cust : userId
+prod --> cat : categoryId
+rev --> prod : productId
+rev --> cust : userId
+cart *-- ci : items
+cart --> cust : userId
+ci --> prod : productId
+@enduml
