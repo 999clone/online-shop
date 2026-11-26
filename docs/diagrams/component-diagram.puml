@@ -1,0 +1,106 @@
+@startuml
+title Online Shop - Component Diagram (SOLID Layered Architecture)
+skinparam componentStyle uml2
+
+package "Bootstrap" {
+    [Main (Composition Root)] as Main
+}
+
+package "Presentation Layer (CLI)" {
+    [ConsoleApp] as Console
+    [MenuHandlers\n(Guest / Customer / Admin)] as Handlers
+    [CatalogBrowserView & InputHelper] as Views
+    Console --> Handlers : uses MenuHandler
+    Handlers --> Views
+}
+
+package "Service Layer" {
+    [UserService] as US
+    [ProductService] as PS
+    [CategoryService] as CS
+    [CartService] as CartS
+    [OrderService] as OS
+    [PaymentService] as PayS
+    [InventoryService] as IS
+    [ReviewService] as RS
+}
+
+package "Service Abstractions & Adapters" {
+    interface PasswordHasher
+    interface PaymentGateway
+    interface ProductRatingProvider
+    interface ProductSortStrategy
+    [Sha256PasswordHasher] as Hasher
+    [SimulatedPaymentGateway] as Gateway
+    [SortStrategies & Factory] as Sorters
+
+    Hasher ..|> PasswordHasher
+    Gateway ..|> PaymentGateway
+    RS ..|> ProductRatingProvider
+    Sorters ..|> ProductSortStrategy
+}
+
+package "Domain Model Layer" {
+    [Entities\n(User, Product, Category, Cart, Order, Review)] as Entities
+    [Value Objects & Enums\n(Address, CartItem, OrderItem, PaymentTransaction)] as VOs
+    [Domain Exceptions] as Exceptions
+}
+
+package "Persistence Layer (Repositories)" {
+    interface UserRepository
+    interface ProductRepository
+    interface CategoryRepository
+    interface CartRepository
+    interface OrderRepository
+    interface ReviewRepository
+    [InMemory Repositories\n& SampleDataSeeder] as InMem
+    InMem ..|> UserRepository
+    InMem ..|> ProductRepository
+    InMem ..|> CategoryRepository
+    InMem ..|> CartRepository
+    InMem ..|> OrderRepository
+    InMem ..|> ReviewRepository
+}
+
+Main --> Console
+Main --> InMem
+Main --> Hasher
+Main --> Gateway
+
+Handlers --> US
+Handlers --> PS
+Handlers --> CS
+Handlers --> CartS
+Handlers --> OS
+Handlers --> PayS
+Handlers --> IS
+Handlers --> RS
+
+US --> PasswordHasher
+US --> UserRepository
+PS --> ProductRepository
+PS --> CategoryRepository
+PS --> ProductRatingProvider
+PS --> ProductSortStrategy
+CS --> CategoryRepository
+CartS --> CartRepository
+CartS --> ProductRepository
+OS --> OrderRepository
+OS --> CartS
+OS --> ProductRepository
+OS --> US
+PayS --> OS
+PayS --> ProductRepository
+PayS --> PaymentGateway
+IS --> ProductRepository
+RS --> ReviewRepository
+RS --> OrderRepository
+RS --> ProductRepository
+RS --> US
+
+US --> Entities
+PS --> Entities
+OS --> Entities
+Entities --> VOs
+Entities --> Exceptions
+@enduml
